@@ -1,21 +1,50 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UIState {
-  sidebarCollapsed: boolean;
+interface SidebarStore {
+  isExpanded: boolean;
   toggleSidebar: () => void;
+  setSidebarExpanded: (expanded: boolean) => void;
 }
 
-export const useUIStore = create<UIState>()(
+interface ContactsStore {
+  isExpanded: boolean;
+  toggleContacts: () => void;
+  setContactsExpanded: (expanded: boolean) => void;
+}
+
+type Theme = "light" | "dark";
+
+interface ThemeStore {
+  theme: Theme;
+  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
+}
+
+export const useSidebarStore = create<SidebarStore>((set) => ({
+  isExpanded: false,
+  toggleSidebar: () => set((state) => ({ isExpanded: !state.isExpanded })),
+  setSidebarExpanded: (expanded: boolean) => set({ isExpanded: expanded }),
+}));
+
+export const useContactsStore = create<ContactsStore>((set) => ({
+  isExpanded: false,
+  toggleContacts: () => set((state) => ({ isExpanded: !state.isExpanded })),
+  setContactsExpanded: (expanded: boolean) => set({ isExpanded: expanded }),
+}));
+
+export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      sidebarCollapsed: false,
-      toggleSidebar: () =>
-        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+      theme: "light",
+      toggleTheme: () =>
+        set((state) => ({
+          theme: state.theme === "light" ? "dark" : "light",
+        })),
+      setTheme: (theme: Theme) => set({ theme }),
     }),
     {
-      name: "ui-store",
-      partialize: (state) => ({ sidebarCollapsed: state.sidebarCollapsed }),
+      name: "theme-storage",
     }
   )
 );

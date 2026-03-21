@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { useUIStore } from "@/stores/ui-store";
-import { Sidebar } from "@/components/layout/sidebar";
+import { useSidebarStore } from "@/stores/ui-store";
+import Sidebar from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { MobileSidebar } from "@/components/layout/mobile-sidebar";
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton";
@@ -16,7 +16,6 @@ export default function DashboardLayout({
 }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -25,16 +24,11 @@ export default function DashboardLayout({
     }
   }, [isLoading, isAuthenticated, router]);
 
-  // Wire mobile sidebar toggle from the header's hamburger
-  // The header calls toggleSidebar which we intercept for mobile
   useEffect(() => {
-    // On mobile, subscribe to sidebar toggle for mobile behavior
-    const unsubscribe = useUIStore.subscribe((state, prevState) => {
-      if (state.sidebarCollapsed !== prevState.sidebarCollapsed) {
+    const unsubscribe = useSidebarStore.subscribe((state, prevState) => {
+      if (state.isExpanded !== prevState.isExpanded) {
         if (window.innerWidth < 768) {
           setMobileOpen((prev) => !prev);
-          // Revert the desktop state since this was meant for mobile
-          // We want to keep the state separate
         }
       }
     });
