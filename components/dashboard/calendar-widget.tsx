@@ -12,6 +12,11 @@ import {
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
@@ -24,12 +29,30 @@ const EVENT_DOT: Record<EventKind, string> = {
   surgery: "bg-violet-500",
 };
 
-/** Demo events keyed by yyyy-MM-dd (order = dot order left-to-right) */
-const EVENTS_BY_DATE: Record<string, EventKind[]> = {
-  "2026-03-06": ["appointment", "meeting", "surgery"],
-  "2026-03-12": ["meeting", "surgery"],
-  "2026-03-25": ["appointment", "appointment", "meeting", "surgery"],
-  "2026-03-30": ["meeting"],
+type TimelineEvent = {
+  kind: EventKind;
+  /** Shown in hover tooltip, e.g. "Appointment at 3:00 PM" */
+  label: string;
+};
+
+/** Demo schedule keyed by yyyy-MM-dd (dots follow this order) */
+const EVENT_TIMELINES: Record<string, TimelineEvent[]> = {
+  "2026-03-06": [
+    { kind: "meeting", label: "Meeting at 11:00 AM" },
+    { kind: "appointment", label: "Appointment at 3:00 PM" },
+    { kind: "surgery", label: "Surgery from 4:00–5:00 PM" },
+  ],
+  "2026-03-12": [
+    { kind: "meeting", label: "Meeting at 9:30 AM" },
+    { kind: "surgery", label: "Surgery from 1:00–2:30 PM" },
+  ],
+  "2026-03-25": [
+    { kind: "appointment", label: "Appointment at 8:00 AM" },
+    { kind: "appointment", label: "Appointment at 3:00 PM" },
+    { kind: "meeting", label: "Meeting at 12:00 PM" },
+    { kind: "surgery", label: "Surgery from 4:00–5:00 PM" },
+  ],
+  "2026-03-30": [{ kind: "meeting", label: "Meeting at 2:00 PM" }],
 };
 
 function buildMonthCells(viewMonth: Date) {
@@ -169,15 +192,17 @@ export function CalendarWidget() {
               const isEndpoint = isStart || isEnd;
               const inRangeMiddle = inSelectedRange && !isEndpoint;
 
-              const events = EVENTS_BY_DATE[key];
+              const timeline = EVENT_TIMELINES[key];
+              const hasTimeline = Boolean(
+                inMonth && timeline && timeline.length > 0
+              );
 
-              return (
+              const dayButton = (
                 <button
-                  key={key}
                   type="button"
                   onClick={() => handleDayClick(date)}
                   className={cn(
-                    "relative flex min-h-[3rem] flex-col items-center justify-center gap-1 px-0.5 py-2 font-mono text-[12px] tabular-nums transition-colors duration-150",
+                    "relative flex h-full min-h-[3rem] w-full flex-col items-center justify-center gap-1 px-0.5 py-2 font-mono text-[12px] tabular-nums transition-colors duration-150",
                     !inMonth &&
                       cn("pointer-events-none text-muted-foreground/40"),
                     inMonth && !inSelectedRange && "text-foreground",
@@ -203,14 +228,14 @@ export function CalendarWidget() {
                   >
                     {dayNum}
                   </span>
-                  {inMonth && events && events.length > 0 && (
+                  {inMonth && timeline && timeline.length > 0 && (
                     <span className="flex h-2 items-center justify-center gap-0.5">
-                      {events.map((ev, evi) => (
+                      {timeline.map((ev, evi) => (
                         <span
                           key={`${key}-${evi}`}
                           className={cn(
                             "size-1.5 shrink-0 rounded-full",
-                            EVENT_DOT[ev],
+                            EVENT_DOT[ev.kind],
                             isEndpoint && "ring-1 ring-primary-foreground/35"
                           )}
                           aria-hidden
@@ -219,6 +244,57 @@ export function CalendarWidget() {
                     </span>
                   )}
                 </button>
+              );
+
+              return (
+                <div
+                  key={key}
+                  className="relative flex min-h-[3rem] w-full min-w-0 flex-col"
+                >
+                  {hasTimeline ? (
+                    <Tooltip>
+                      {/*
+                        Do not use display:contents on the trigger — it removes the
+                        anchor box and the tooltip positions at (0,0).
+                      */}
+                      <TooltipTrigger
+                        render={
+                          <div className="flex h-full min-h-[3rem] w-full flex-col" />
+                        }
+                      >
+                        {dayButton}
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        sideOffset={8}
+                        className="max-w-[min(280px,calc(100vw-2rem))] flex-col items-stretch gap-0 px-3 py-2.5 text-left"
+                      >
+                        <p className="mb-2 border-b border-background/20 pb-1.5 font-mono text-[10px] font-medium tracking-wide text-background/80 uppercase">
+                          {format(date, "EEE, MMM d")}
+                        </p>
+                        <ul className="flex flex-col gap-2">
+                          {timeline!.map((ev, i) => (
+                            <li
+                              key={`${key}-tl-${i}`}
+                              className="flex gap-2.5 text-xs leading-snug text-background"
+                            >
+                              <span
+                                className={cn(
+                                  "mt-1.5 size-1.5 shrink-0 rounded-full",
+                                  EVENT_DOT[ev.kind]
+                                )}
+                                aria-hidden
+                              />
+                              <span>{ev.label}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    dayButton
+                  )}
+                </div>
               );
             })}
           </div>
