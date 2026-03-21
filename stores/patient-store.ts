@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useShallow } from "zustand/shallow";
 import type { Patient, PatientFilters, ViewMode } from "@/types";
 import { mockPatients } from "@/data/mock-patients";
 
@@ -40,18 +41,18 @@ export const usePatientStore = create<PatientState>()(
 );
 
 export function useFilteredPatients() {
-  return usePatientStore((state) => {
-    const { patients, filters } = state;
-    return patients.filter((p) => {
-      const matchesStatus =
-        filters.status === "all" || p.status === filters.status;
-      const query = filters.searchQuery.toLowerCase();
-      const matchesSearch =
-        !query ||
-        `${p.firstName} ${p.lastName}`.toLowerCase().includes(query) ||
-        p.diagnosis.toLowerCase().includes(query) ||
-        p.email.toLowerCase().includes(query);
-      return matchesStatus && matchesSearch;
-    });
+  const patients = usePatientStore((s) => s.patients);
+  const filters = usePatientStore(useShallow((s) => s.filters));
+
+  return patients.filter((p) => {
+    const matchesStatus =
+      filters.status === "all" || p.status === filters.status;
+    const query = filters.searchQuery.toLowerCase();
+    const matchesSearch =
+      !query ||
+      `${p.firstName} ${p.lastName}`.toLowerCase().includes(query) ||
+      p.diagnosis.toLowerCase().includes(query) ||
+      p.email.toLowerCase().includes(query);
+    return matchesStatus && matchesSearch;
   });
 }
