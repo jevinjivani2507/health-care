@@ -15,6 +15,22 @@ export interface Vitals {
   height: number;
 }
 
+export interface LabResult {
+  name: string;
+  value: number;
+  min: number;
+  max: number;
+  unit: string;
+}
+
+export interface HealthMetricPoint {
+  date: string;
+  heartRate: number;
+  bloodPressure: number;
+  glucose: number;
+  oxygenSaturation: number;
+}
+
 export interface MedicalHistoryEntry {
   id: string;
   date: string;
@@ -50,6 +66,9 @@ export interface Patient {
   admissionDate: string;
   insuranceProvider: string;
   vitals: Vitals;
+  labs: LabResult[];
+  healthMetrics: HealthMetricPoint[];
+  allergies: string[];
   medicalHistory: MedicalHistoryEntry[];
   appointments: Appointment[];
   avatarUrl?: string;

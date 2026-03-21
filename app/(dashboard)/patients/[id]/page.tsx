@@ -10,6 +10,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { fadeInUp } from "@/lib/animations";
 import { PatientHeader } from "@/components/patients/patient-detail/patient-header";
 import { PatientVitals } from "@/components/patients/patient-detail/patient-vitals";
+import { HealthMetricsChart } from "@/components/patients/patient-detail/health-metrics-chart";
+import { PatientLabs } from "@/components/patients/patient-detail/patient-labs";
+import { RiskForecast } from "@/components/patients/patient-detail/risk-forecast";
 import { PatientHistory } from "@/components/patients/patient-detail/patient-history";
 import { PatientAppointments } from "@/components/patients/patient-detail/patient-appointments";
 import { usePatientStore } from "@/stores/patient-store";
@@ -32,31 +35,57 @@ export default function PatientDetailPage({
       variants={fadeInUp}
       initial="initial"
       animate="animate"
-      className="space-y-6"
+      className="space-y-4"
     >
+      {/* Back + Title */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon-sm" render={<Link href="/patients" aria-label="Back to patients" />}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          render={<Link href="/patients" aria-label="Back to patients" />}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <span className="text-sm text-muted-foreground">Back to patients</span>
+        <h1 className="text-lg font-heading font-bold">Patient Details</h1>
       </div>
 
-      <PatientHeader patient={patient} />
-
-      <Tabs defaultValue="vitals">
+      {/* Tabs across the top */}
+      <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="vitals">Vitals</TabsTrigger>
-          <TabsTrigger value="history">Medical History</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="appointments">Appointments</TabsTrigger>
+          <TabsTrigger value="history">Medical Reports</TabsTrigger>
         </TabsList>
-        <TabsContent value="vitals" className="mt-4">
-          <PatientVitals vitals={patient.vitals} />
+
+        {/* ── Overview Tab ── */}
+        <TabsContent value="overview" className="mt-4 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
+            {/* Left column — patient info */}
+            <div className="space-y-4">
+              <PatientHeader patient={patient} />
+              <PatientAppointments appointments={patient.appointments} />
+            </div>
+
+            {/* Right column — vitals, chart, labs, risk */}
+            <div className="space-y-4">
+              <PatientVitals vitals={patient.vitals} />
+              <HealthMetricsChart data={patient.healthMetrics} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <PatientLabs labs={patient.labs} />
+                <RiskForecast patient={patient} />
+              </div>
+            </div>
+          </div>
         </TabsContent>
-        <TabsContent value="history" className="mt-4">
-          <PatientHistory history={patient.medicalHistory} />
-        </TabsContent>
+
+        {/* ── Appointments Tab ── */}
         <TabsContent value="appointments" className="mt-4">
           <PatientAppointments appointments={patient.appointments} />
+        </TabsContent>
+
+        {/* ── Medical Reports Tab ── */}
+        <TabsContent value="history" className="mt-4">
+          <PatientHistory history={patient.medicalHistory} />
         </TabsContent>
       </Tabs>
     </motion.div>

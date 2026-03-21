@@ -17,7 +17,7 @@ const findItemByPath = (pathname: string) => {
   // Check dashboard items
   for (const item of dashboardItems) {
     if (item.href === pathname) {
-      return { section: "Dashboards", parent: null, current: item };
+      return { section: "Dashboards", parent: null as { href: string; label: string } | null, current: item };
     }
   }
 

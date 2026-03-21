@@ -1,6 +1,44 @@
-import type { Patient } from "@/types";
+import type { Patient, LabResult, HealthMetricPoint } from "@/types";
 
-export const mockPatients: Patient[] = [
+function generateLabs(seed: number): LabResult[] {
+  const s = (n: number) => ((seed * 13 + n * 7) % 100) / 100;
+  return [
+    { name: "Mg", value: +(1.5 + s(1) * 1.2).toFixed(1), min: 1.7, max: 2.2, unit: "mg/dL" },
+    { name: "Fe", value: +(40 + s(2) * 140).toFixed(0), min: 60, max: 170, unit: "µg/dL" },
+    { name: "Cu", value: +(0.5 + s(3) * 1.5).toFixed(1), min: 0.75, max: 1.45, unit: "mg/L" },
+    { name: "Ca", value: +(8.0 + s(4) * 3.0).toFixed(1), min: 8.5, max: 10.5, unit: "mg/dL" },
+  ];
+}
+
+function generateHealthMetrics(hr: number, bp: number, o2: number): HealthMetricPoint[] {
+  return [
+    { date: "2025-10", heartRate: hr - 4, bloodPressure: bp + 2, glucose: 95, oxygenSaturation: o2 },
+    { date: "2025-11", heartRate: hr - 2, bloodPressure: bp - 1, glucose: 102, oxygenSaturation: o2 - 1 },
+    { date: "2025-12", heartRate: hr + 3, bloodPressure: bp + 5, glucose: 98, oxygenSaturation: o2 },
+    { date: "2026-01", heartRate: hr - 1, bloodPressure: bp - 3, glucose: 110, oxygenSaturation: o2 + 1 },
+    { date: "2026-02", heartRate: hr + 1, bloodPressure: bp, glucose: 105, oxygenSaturation: o2 - 1 },
+    { date: "2026-03", heartRate: hr, bloodPressure: bp + 1, glucose: 99, oxygenSaturation: o2 },
+  ];
+}
+
+const allergySets: string[][] = [
+  ["Penicillin", "Sulfa"],
+  ["Nuts", "Eggs", "Lactose"],
+  ["Aspirin"],
+  ["Latex", "Iodine"],
+  ["None known"],
+  ["Shellfish", "NSAIDs"],
+  ["Codeine"],
+  ["Pollen", "Dust"],
+  ["None known"],
+  ["Penicillin", "Latex"],
+  ["Eggs"],
+  ["Sulfa", "Aspirin"],
+  ["None known"],
+  ["Nuts"],
+];
+
+const rawPatients: Omit<Patient, "labs" | "healthMetrics" | "allergies">[] = [
   {
     id: "p001",
     firstName: "Sarah",
@@ -423,3 +461,14 @@ export const mockPatients: Patient[] = [
     ],
   },
 ];
+
+export const mockPatients: Patient[] = rawPatients.map((p, i) => ({
+  ...p,
+  labs: generateLabs(i),
+  healthMetrics: generateHealthMetrics(
+    p.vitals.heartRate,
+    parseInt(p.vitals.bloodPressure.split("/")[0]),
+    p.vitals.oxygenSaturation
+  ),
+  allergies: allergySets[i % allergySets.length],
+}));
