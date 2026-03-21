@@ -1,28 +1,14 @@
 "use client";
 
-import { motion } from "motion/react";
-import {
-  Users,
-  Stethoscope,
-  UserList,
-  Bed,
-} from "@phosphor-icons/react";
-import { staggerContainer } from "@/lib/animations";
+import { Users, Stethoscope, UserList, Bed } from "@phosphor-icons/react";
 import { StatsCard } from "./stats-card";
 import { usePatientStore } from "@/stores/patient-store";
 
 export function StatsGrid() {
   const patients = usePatientStore((s) => s.patients);
-  const active = patients.filter((p) => p.status === "active").length;
-  const critical = patients.filter((p) => p.status === "critical").length;
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-    >
+    <div className="grid h-full min-h-0 w-full flex-1 grid-cols-2 gap-4 lg:grid-cols-4 lg:grid-rows-1">
       <StatsCard
         title="Visitors"
         value={4592}
@@ -51,6 +37,6 @@ export function StatsGrid() {
         icon={Bed}
         description="Available"
       />
-    </motion.div>
+    </div>
   );
 }

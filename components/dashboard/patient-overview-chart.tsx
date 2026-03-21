@@ -39,14 +39,17 @@ const chartConfig = {
 
 export function PatientOverviewChart() {
   return (
-    <Card className="flex-1">
-      <CardHeader className="pb-2">
+    <Card className="flex h-full min-h-0 flex-1 flex-col">
+      <CardHeader className="shrink-0 pb-2">
         <CardTitle className="text-base font-heading">
           Patient Overview
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[280px] w-full">
+      <CardContent className="flex min-h-0 flex-1 flex-col pt-0">
+        <ChartContainer
+          config={chartConfig}
+          className="!aspect-auto h-full min-h-[220px] w-full flex-1 md:min-h-[260px]"
+        >
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -92,9 +95,7 @@ export function PatientOverviewChart() {
               tickMargin={8}
               fontSize={11}
             />
-            <ChartTooltip
-              content={<ChartTooltipContent indicator="dot" />}
-            />
+            <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
             <ChartLegend
               content={<ChartLegendContent />}
               verticalAlign="top"

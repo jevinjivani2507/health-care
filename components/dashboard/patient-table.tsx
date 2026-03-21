@@ -32,8 +32,8 @@ export function PatientTable() {
   const displayedPatients = patients.slice(0, 5);
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="flex h-full min-h-0 flex-col">
+      <CardHeader className="shrink-0 pb-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <CardTitle className="text-base font-heading">
@@ -61,8 +61,8 @@ export function PatientTable() {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="border border-border">
+      <CardContent className="flex min-h-0 flex-1 flex-col">
+        <div className="min-h-0 flex-1 overflow-x-auto border border-border">
           <Table>
             <TableHeader>
               <TableRow>

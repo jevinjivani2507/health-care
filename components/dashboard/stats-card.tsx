@@ -25,14 +25,14 @@ export function StatsCard({
   highlighted = false,
 }: StatsCardProps) {
   return (
-    <motion.div variants={staggerItem}>
+    <motion.div variants={staggerItem} className="h-full min-h-0">
       <Card
         className={cn(
-          "transition-colors",
+          "flex h-full min-h-0 flex-col transition-colors",
           highlighted && "bg-primary text-primary-foreground"
         )}
       >
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="flex min-h-0 flex-1 flex-col space-y-3 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div
@@ -101,7 +101,7 @@ export function StatsCard({
           {description && (
             <p
               className={cn(
-                "text-[11px] leading-relaxed",
+                "line-clamp-3 text-[11px] leading-relaxed",
                 highlighted
                   ? "text-primary-foreground/70"
                   : "text-muted-foreground"
