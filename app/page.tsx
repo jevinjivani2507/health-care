@@ -1,9 +1,5 @@
-import { Demo } from "@/components/demo";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div>
-      <Demo />
-    </div>
-  );
+  redirect("/dashboard");
 }
