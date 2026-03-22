@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Icon } from "@phosphor-icons/react";
 
 interface SidebarNavItemProps {
@@ -13,7 +17,12 @@ interface SidebarNavItemProps {
   collapsed: boolean;
 }
 
-export function SidebarNavItem({ href, label, icon: Icon, collapsed }: SidebarNavItemProps) {
+export function SidebarNavItem({
+  href,
+  label,
+  icon: Icon,
+  collapsed,
+}: SidebarNavItemProps) {
   const pathname = usePathname();
   const isActive = pathname === href || pathname.startsWith(href + "/");
 
@@ -25,10 +34,19 @@ export function SidebarNavItem({ href, label, icon: Icon, collapsed }: SidebarNa
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         isActive
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
-          : "text-sidebar-foreground/70"
+          : "text-sidebar-foreground/70",
       )}
     >
-      <Icon className="h-5 w-5 shrink-0" weight={isActive ? "fill" : "regular"} />
+      <Icon
+        className={cn(
+          "h-5 w-5 shrink-0",
+          isActive
+            ? "text-sidebar-accent-foreground"
+            : "text-sidebar-foreground/70",
+        )}
+        weight={isActive ? "fill" : "regular"}
+      />
+
       {!collapsed && <span className="truncate">{label}</span>}
     </Link>
   );

@@ -9,7 +9,7 @@ const ProfileSection = ({
   userName: string;
 }) => {
   return (
-    <div className="pt-2 pb-5">
+    <div className="flex h-full items-center px-4">
       <div className="flex items-center gap-3">
         <div className="relative size-8 flex-shrink-0 overflow-hidden rounded-full bg-gray-200">
           <Image

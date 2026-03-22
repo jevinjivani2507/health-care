@@ -47,7 +47,7 @@ export function NotificationBell() {
           <Bell className="h-5 w-5" />
         </motion.div>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center bg-destructive text-destructive-foreground text-[10px] font-bold">
+          <span className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center text-[10px] font-bold">
             {unreadCount}
           </span>
         )}
@@ -65,22 +65,22 @@ export function NotificationBell() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 w-80 bg-popover border border-border shadow-lg z-50"
+              className="bg-popover border-border absolute top-full right-0 z-50 mt-2 w-80 border shadow-lg"
             >
-              <div className="flex items-center justify-between p-3 border-b border-border">
+              <div className="border-border flex items-center justify-between border-b p-3">
                 <span className="text-sm font-medium">Notifications</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs text-primary hover:underline"
+                    className="text-primary text-xs hover:underline"
                   >
                     Mark all as read
                   </button>
                 )}
               </div>
-              <ScrollArea className="max-h-80">
+              <ScrollArea className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <p className="p-4 text-sm text-muted-foreground text-center">
+                  <p className="text-muted-foreground p-4 text-center text-sm">
                     No notifications
                   </p>
                 ) : (
@@ -90,27 +90,27 @@ export function NotificationBell() {
                         key={n.id}
                         onClick={() => markAsRead(n.id)}
                         className={cn(
-                          "w-full text-left p-3 border-b border-border last:border-0 hover:bg-muted/50 transition-colors",
-                          !n.read && "bg-muted/30"
+                          "border-border hover:bg-muted/50 w-full border-b p-3 text-left transition-colors last:border-0",
+                          !n.read && "bg-muted/30",
                         )}
                       >
                         <div className="flex items-start gap-2">
                           {!n.read && (
-                            <span className="mt-1.5 h-2 w-2 bg-primary shrink-0" />
+                            <span className="bg-primary mt-1.5 h-2 w-2 shrink-0" />
                           )}
                           <div className="min-w-0 flex-1">
                             <p
                               className={cn(
                                 "text-xs font-medium",
-                                typeColors[n.type]
+                                typeColors[n.type],
                               )}
                             >
                               {n.title}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                            <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">
                               {n.message}
                             </p>
-                            <p className="text-[10px] text-muted-foreground mt-1">
+                            <p className="text-muted-foreground mt-1 text-[10px]">
                               {new Date(n.timestamp).toLocaleDateString(
                                 "en-US",
                                 {
@@ -118,7 +118,7 @@ export function NotificationBell() {
                                   day: "numeric",
                                   hour: "numeric",
                                   minute: "2-digit",
-                                }
+                                },
                               )}
                             </p>
                           </div>

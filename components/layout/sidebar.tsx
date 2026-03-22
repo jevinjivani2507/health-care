@@ -2,12 +2,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useSidebarStore } from "@/stores/ui-store";
-import {
-  NavSidebar,
-  NavItemData,
-  TabSection,
-  TabItem,
-} from "@/components/navigation";
+import { NavSidebar, NavItemData } from "@/components/navigation";
 import ProfileSection from "@/components/navigation/profile-section";
 import { XIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
@@ -19,10 +14,6 @@ const Sidebar = () => {
     if (item.href) {
       console.log("Navigate to:", item.href);
     }
-  };
-
-  const handleTabItemClick = (item: TabItem) => {
-    console.log("Tab item clicked:", item);
   };
 
   return (
@@ -68,11 +59,11 @@ const Sidebar = () => {
           </div>
         )}
 
-        <div className="flex-shrink-0 p-4">
+        <div className="border-border h-14 flex-shrink-0 border-b">
           <ProfileSection isExpanded={isExpanded} userName="ByeWind" />
         </div>
 
-        <div className="scrollbar-hide flex-1 overflow-y-auto px-4 pb-4">
+        <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
           <NavSidebar onItemClick={handleItemClick} isExpanded={isExpanded} />
         </div>
       </motion.div>
