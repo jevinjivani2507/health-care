@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useSidebarStore } from "@/stores/ui-store";
+import { useSidebarStore } from "@/stores/sidebar-store";
 import { NavSidebar, NavItemData } from "@/components/navigation";
 import ProfileSection from "@/components/navigation/profile-section";
 import { XIcon } from "@phosphor-icons/react";

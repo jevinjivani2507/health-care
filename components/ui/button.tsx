@@ -44,12 +44,23 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
+  nativeButton: nativeButtonProp,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  const nativeButton =
+    nativeButtonProp !== undefined
+      ? nativeButtonProp
+      : render != null
+        ? false
+        : true
+
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      nativeButton={nativeButton}
+      render={render}
       {...props}
     />
   )

@@ -22,7 +22,7 @@ interface ThemeStore {
 }
 
 export const useSidebarStore = create<SidebarStore>((set) => ({
-  isExpanded: false,
+  isExpanded: true,
   toggleSidebar: () => set((state) => ({ isExpanded: !state.isExpanded })),
   setSidebarExpanded: (expanded: boolean) => set({ isExpanded: expanded }),
 }));
@@ -45,6 +45,6 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: "theme-storage",
-    }
-  )
+    },
+  ),
 );
