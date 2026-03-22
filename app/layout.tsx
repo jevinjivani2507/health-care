@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, JetBrains_Mono, Noto_Sans, Nunito_Sans } from "next/
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/providers/auth-provider";
+import { ServiceWorkerRegister } from "@/providers/service-worker-register";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const nunitoSans = Nunito_Sans({subsets:['latin'],variable:'--font-sans'});
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
+          <ServiceWorkerRegister />
           <TooltipProvider>{children}</TooltipProvider>
         </AuthProvider>
       </body>

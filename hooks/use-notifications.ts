@@ -1,19 +1,26 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useNotificationStore } from "@/stores/notification-store";
 import type { AppNotification, NotificationType } from "@/types";
 
+async function postShowNotificationToServiceWorker(title: string, body: string) {
+  if (!("serviceWorker" in navigator)) return;
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const worker = registration.active ?? navigator.serviceWorker.controller;
+    if (!worker) return;
+    worker.postMessage({
+      type: "SHOW_NOTIFICATION",
+      payload: { title, body },
+    });
+  } catch {
+    // SW not available or message failed
+  }
+}
+
 export function useNotifications() {
   const { addNotification } = useNotificationStore();
-
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        // SW registration failed silently
-      });
-    }
-  }, []);
 
   const requestPermission = useCallback(async () => {
     if ("Notification" in window) {
@@ -24,7 +31,12 @@ export function useNotifications() {
   }, []);
 
   const sendLocalNotification = useCallback(
-    (title: string, message: string, type: NotificationType = "system", patientId?: string) => {
+    (
+      title: string,
+      message: string,
+      type: NotificationType = "system",
+      patientId?: string,
+    ) => {
       const notification: AppNotification = {
         id: `n-${Date.now()}`,
         type,
@@ -37,15 +49,16 @@ export function useNotifications() {
 
       addNotification(notification);
 
-      // Send to service worker for OS notification
-      if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: "SHOW_NOTIFICATION",
-          payload: { title, body: message },
-        });
+      // OS notification via service worker (requires permission)
+      if (
+        typeof window !== "undefined" &&
+        "Notification" in window &&
+        Notification.permission === "granted"
+      ) {
+        void postShowNotificationToServiceWorker(title, message);
       }
     },
-    [addNotification]
+    [addNotification],
   );
 
   return { requestPermission, sendLocalNotification };
