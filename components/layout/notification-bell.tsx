@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "motion/react";
 import { Bell } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { bellShake } from "@/lib/animations";
 import { useNotificationStore } from "@/stores/notification-store";
 import { cn } from "@/lib/utils";
@@ -23,6 +22,15 @@ export function NotificationBell() {
       return () => clearTimeout(timer);
     }
   }, [unreadCount]);
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   const typeColors: Record<string, string> = {
     "patient-alert": "text-destructive",
@@ -66,6 +74,7 @@ export function NotificationBell() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.15 }}
               className="bg-popover border-border absolute top-full right-0 z-50 mt-2 w-80 border shadow-lg"
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <div className="border-border flex items-center justify-between border-b p-3">
                 <span className="text-sm font-medium">Notifications</span>
@@ -78,7 +87,7 @@ export function NotificationBell() {
                   </button>
                 )}
               </div>
-              <ScrollArea className="max-h-80 overflow-y-auto">
+              <ScrollArea className="h-80">
                 {notifications.length === 0 ? (
                   <p className="text-muted-foreground p-4 text-center text-sm">
                     No notifications

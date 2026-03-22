@@ -1,14 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  addMonths,
-  differenceInCalendarDays,
-  format,
-  isSameDay,
-  isWithinInterval,
-  startOfDay,
-} from "date-fns";
+import { addMonths, format, isSameDay, startOfDay } from "date-fns";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,40 +73,19 @@ function buildMonthCells(viewMonth: Date) {
   return cells;
 }
 
-function inclusiveRangeDayCount(from: Date, to: Date) {
-  return differenceInCalendarDays(to, from) + 1;
-}
-
 export function CalendarWidget() {
   const [viewMonth, setViewMonth] = useState(() => new Date(2026, 2, 1));
 
-  const [range, setRange] = useState<{ from: Date; to: Date } | null>({
-    from: startOfDay(new Date(2026, 2, 4)),
-    to: startOfDay(new Date(2026, 2, 19)),
-  });
-
-  const [rangeAnchor, setRangeAnchor] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    startOfDay(new Date(2026, 2, 15)),
+  );
 
   const cells = useMemo(() => buildMonthCells(viewMonth), [viewMonth]);
-
-  const selectedCount =
-    range != null ? inclusiveRangeDayCount(range.from, range.to) : 0;
 
   const monthLabel = format(viewMonth, "MMMM yyyy");
 
   function handleDayClick(raw: Date) {
-    const d = startOfDay(raw);
-
-    if (rangeAnchor !== null) {
-      const from = rangeAnchor <= d ? rangeAnchor : d;
-      const to = rangeAnchor <= d ? d : rangeAnchor;
-      setRange({ from, to });
-      setRangeAnchor(null);
-      return;
-    }
-
-    setRangeAnchor(d);
-    setRange({ from: d, to: d });
+    setSelectedDate(startOfDay(raw));
   }
 
   return (
@@ -126,10 +98,10 @@ export function CalendarWidget() {
             </CardTitle>
             <p className="text-xs text-muted-foreground">{monthLabel}</p>
           </div>
-          {range != null && (
+          {selectedDate != null && (
             <div className="text-right">
               <p className="font-mono text-xs font-medium tabular-nums tracking-tight text-foreground">
-                {selectedCount} {selectedCount === 1 ? "day" : "days"} selected
+                {format(selectedDate, "MMM d, yyyy")}
               </p>
             </div>
           )}
@@ -180,21 +152,12 @@ export function CalendarWidget() {
               const key = format(date, "yyyy-MM-dd");
               const dayNum = date.getDate();
 
-              const inSelectedRange =
-                range != null &&
-                isWithinInterval(startOfDay(date), {
-                  start: range.from,
-                  end: range.to,
-                });
-
-              const isStart = range != null && isSameDay(date, range.from);
-              const isEnd = range != null && isSameDay(date, range.to);
-              const isEndpoint = isStart || isEnd;
-              const inRangeMiddle = inSelectedRange && !isEndpoint;
+              const isSelected =
+                selectedDate != null && isSameDay(date, selectedDate);
 
               const timeline = EVENT_TIMELINES[key];
               const hasTimeline = Boolean(
-                inMonth && timeline && timeline.length > 0
+                inMonth && timeline && timeline.length > 0,
               );
 
               const dayButton = (
@@ -205,26 +168,16 @@ export function CalendarWidget() {
                     "relative flex h-full min-h-[3rem] w-full flex-col items-center justify-center gap-1 px-0.5 py-2 font-mono text-[12px] tabular-nums transition-colors duration-150",
                     !inMonth &&
                       cn("pointer-events-none text-muted-foreground/40"),
-                    inMonth && !inSelectedRange && "text-foreground",
-                    inMonth && !inSelectedRange && "bg-card",
-                    inRangeMiddle &&
-                      "bg-primary/10 text-foreground hover:bg-primary/15",
-                    !inRangeMiddle &&
-                      inMonth &&
-                      inSelectedRange &&
-                      "text-foreground",
-                    isEndpoint &&
+                    inMonth && !isSelected && "bg-card text-foreground",
+                    isSelected &&
                       "z-[1] bg-primary text-primary-foreground shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] hover:bg-primary/92",
-                    inMonth && !inSelectedRange && "hover:bg-muted/50",
+                    inMonth && !isSelected && "hover:bg-muted/50",
                     inMonth &&
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   )}
                 >
                   <span
-                    className={cn(
-                      "leading-none",
-                      isEndpoint && "font-semibold"
-                    )}
+                    className={cn("leading-none", isSelected && "font-semibold")}
                   >
                     {dayNum}
                   </span>
@@ -236,7 +189,7 @@ export function CalendarWidget() {
                           className={cn(
                             "size-1.5 shrink-0 rounded-full",
                             EVENT_DOT[ev.kind],
-                            isEndpoint && "ring-1 ring-primary-foreground/35"
+                            isSelected && "ring-1 ring-primary-foreground/35",
                           )}
                           aria-hidden
                         />
@@ -281,7 +234,7 @@ export function CalendarWidget() {
                               <span
                                 className={cn(
                                   "mt-1.5 size-1.5 shrink-0 rounded-full",
-                                  EVENT_DOT[ev.kind]
+                                  EVENT_DOT[ev.kind],
                                 )}
                                 aria-hidden
                               />
